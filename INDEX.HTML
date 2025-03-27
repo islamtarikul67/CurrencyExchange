@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Plus+Jakarta+Sans:wght@200..800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        :root {
+            --primary: #5267DF;
+            --primary-light: #6E80E1;
+            --primary-dark: #3A4FCC;
+            --secondary: #FF5F70;
+            --dark: #1E2235;
+            --light: #F9FAFC;
+            --gray-100: #F2F4F8;
+            --gray-300: #E6EBEF;
+            --radius: 16px;
+            --shadow: 0 10px 30px rgba(82, 103, 223, 0.15);
+            --shadow-hover: 0 15px 40px rgba(82, 103, 223, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #F6F8FB 0%, #EAEEF6 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            background-color: var(--light);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            opacity: 0.1;
+        }
+        
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--secondary);
+            opacity: 0.1;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius);
+            background-color: var(--light);
+            font-size: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 103, 223, 0.15);
+        }
+
+        .form-icon {
+            position: absolute;
+            right: 1rem;
+            top: 2.7rem;
+            color: var(--primary);
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            appearance: none;
+            width: 1.2rem;
+            height: 1.2rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            margin-right: 0.7rem;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 0.8rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checkbox-wrapper label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1rem;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(82, 103, 223, 0.3);
+        }
+
+        .button:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(82, 103, 223, 0.4);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            background-color: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-label {
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .incentive-result {
+            grid-column: span 2;
+            text-align: center;
+        }
+
+        .currency-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.25rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #888;
+            opacity: 0.8;
+        }
+        
+        /* Aggiungiamo animazioni e stili visuali */
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(82, 103, 223, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(82, 103, 223, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(82, 103, 223, 0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .result-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .incentive-result {
+                grid-column: 1;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .result-value {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Currency Converter</h1>
+        
+        <div class="form-group">
+            <label class="form-label" for="amount">Importo</label>
+            <input type="number" id="amount" class="form-control" step="0.01" placeholder="Inserisci l'importo">
+            <div class="form-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        
+        <div class="form-group select-wrapper">
+            <label class="form-label" for="conversionType">Tipo di conversione</label>
+            <select id="conversionType" class="form-control">
+                <option value="euroToTaka">EURO (€) a TAKA (৳)</option>
+                <option value="takaToEuro">TAKA (৳) a EURO (€)</option>
+            </select>
+            <div class="form-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="exchangeRate">Tasso di cambio (1 euro in taka)</label>
+            <input type="number" id="exchangeRate" class="form-control" step="0.01" placeholder="Inserisci il tasso di cambio">
+            <div class="form-icon">
+                <i class="fas fa-percentage"></i>
+            </div>
+        </div>
+        
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="includeIncentive">
+            <label for="includeIncentive">Includi incentivo (2.5%)</label>
+        </div>
+        
+        <button class="button" onclick="calculateTotalAmount()">
+            Calcola importo totale
+        </button>
+        
+        <div class="result-section">
+            <div class="result-item">
+                <div class="result-label">Importo in Taka</div>
+                <div class="result-value" id="totalInTaka">0 ৳</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Importo in Euro</div>
+                <div class="result-value" id="totalInEuro">0 €</div>
+            </div>
+            
+            <div class="result-item incentive-result">
+                <div class="result-label">Incentivo (2.5%)</div>
+                <div class="result-value" id="incentiveAmount">0 ৳</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            &copy; 2024 HOQUE MOHAMMED TARIKUL. Tutti i diritti riservati.
+        </div>
+    </div>
+
+    <script>
+        function calculateTotalAmount() {
+            const amount = parseFloat(document.getElementById("amount").value) || 0;
+            const conversionType = document.getElementById("conversionType").value;
+            const exchangeRate = parseFloat(document.getElementById("exchangeRate").value) || 0;
+            let totalInTaka = 0;
+            let totalInEuro = 0;
+            let incentiveAmount = 0;
+            
+            // Aggiungiamo animazione al bottone quando viene cliccato
+            document.querySelector('.button').classList.add('pulse');
+            setTimeout(() => {
+                document.querySelector('.button').classList.remove('pulse');
+            }, 1000);
+            
+            if (conversionType === "euroToTaka") {
+                totalInTaka = amount * exchangeRate;
+                totalInEuro = amount;
+            } else if (conversionType === "takaToEuro") {
+                totalInTaka = amount;
+                totalInEuro = amount / exchangeRate;
+            }
+            
+            if (document.getElementById("includeIncentive").checked) {
+                const incentivePercentage = 2.5; // Incentivo fisso al 2.5%
+                incentiveAmount = (totalInTaka * incentivePercentage) / 100;
+                totalInTaka += incentiveAmount;
+            }
+            
+            // Animazione per i risultati
+            document.querySelectorAll('.result-value').forEach(el => {
+                el.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    el.style.transform = 'scale(1)';
+                }, 300);
+            });
+            
+            document.getElementById("totalInTaka").textContent = totalInTaka.toFixed(2) + " ৳";
+            document.getElementById("totalInEuro").textContent = totalInEuro.toFixed(2) + " €";
+            document.getElementById("incentiveAmount").textContent = incentiveAmount.toFixed(2) + " ৳";
+        }
+        
+        // Aggiungiamo effetti visivi all'interfaccia
+        document.addEventListener('DOMContentLoaded', function() {
+            // Effetto focus sui campi di input
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentNode.style.transform = 'translateY(-2px)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentNode.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
