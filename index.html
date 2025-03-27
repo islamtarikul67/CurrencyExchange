@@ -444,7 +444,7 @@
         
         <div class="form-group">
             <label class="form-label" for="exchangeRate">Tasso di cambio (1 euro in taka)</label>
-            <input type="number" id="exchangeRate" class="form-control" step="0.01" placeholder="Inserisci il tasso di cambio" readonly>
+            <input type="number" id="exchangeRate" class="form-control" step="0.01" placeholder="Inserisci il tasso di cambio" value="0">
             <div class="form-icon">
                 <i class="fas fa-percentage"></i>
             </div>
@@ -521,8 +521,10 @@
 
         window.onload = function() {
             if (!localStorage.getItem('exchangeRate')) {
-                modal.style.display = "flex"; // Usa flexbox per centrare
+                //modal.style.display = "flex"; // Usa flexbox per centrare //Commentato per non mostrare all'avvio
             }
+            // Imposta il valore del tasso di cambio nel campo di input
+            exchangeRateField.value = exchangeRateValue;
         };
 
         closeModalBtn.onclick = function() {
@@ -619,8 +621,10 @@
 
             window.onload = function() {
                 if (!localStorage.getItem('exchangeRate')) {
-                    modal.style.display = "flex"; // Usa flexbox per centrare
+                    //modal.style.display = "flex"; // Usa flexbox per centrare //Commentato per non mostrare all'avvio
                 }
+                 // Imposta il valore del tasso di cambio nel campo di input
+                exchangeRateField.value = exchangeRateValue;
             };
 
             closeModalBtn.onclick = function() {
