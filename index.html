@@ -455,6 +455,11 @@
             <label for="includeIncentive">Includi incentivo (2.5%)</label>
         </div>
         
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="calculateCommission">
+            <label for="calculateCommission">Calcola commissione</label>
+        </div>
+        
         <button class="button" onclick="calculateTotalAmount()">
             Calcola importo totale
         </button>
@@ -473,6 +478,11 @@
             <div class="result-item incentive-result">
                 <div class="result-label">Incentivo (2.5%)</div>
                 <div class="result-value" id="incentiveAmount">0 ৳</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Commissione</div>
+                <div class="result-value" id="commissionAmount">0 ৳</div>
             </div>
         </div>
         
@@ -539,6 +549,7 @@
             let totalInTaka = 0;
             let totalInEuro = 0;
             let incentiveAmount = 0;
+            let commissionAmount = 0;
             
             // Aggiungiamo animazione al bottone quando viene cliccato
             document.querySelector('.button').classList.add('pulse');
@@ -560,6 +571,14 @@
                 totalInTaka += incentiveAmount;
             }
             
+            // Calcola la commissione come percentuale dell'importo in Taka
+            if (document.getElementById("calculateCommission").checked) {
+                const commissionRate = 1.85;  // Commissione dell'1.85%
+                commissionAmount = (totalInTaka * commissionRate) / 100;
+            }
+            
+            // Non sommare la commissione al totale in Taka
+            
             // Animazione per i risultati
             document.querySelectorAll('.result-value').forEach(el => {
                 el.style.transform = 'scale(1.1)';
@@ -571,6 +590,7 @@
             document.getElementById("totalInTaka").textContent = totalInTaka.toFixed(2) + " ৳";
             document.getElementById("totalInEuro").textContent = totalInEuro.toFixed(2) + " €";
             document.getElementById("incentiveAmount").textContent = incentiveAmount.toFixed(2) + " ৳";
+            document.getElementById("commissionAmount").textContent = commissionAmount.toFixed(2) + " ৳";
         }
         
         // Aggiungiamo effetti visivi all'interfaccia
