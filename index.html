@@ -254,6 +254,112 @@
             opacity: 0.8;
         }
         
+        /* Stili per il popup */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: var(--shadow-hover);
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+          from {opacity: 0; transform: translateY(-50px);}
+          to {opacity: 1; transform: translateY(0);}
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-body .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .modal-body .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius);
+            background-color: var(--light);
+            font-size: 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            outline: none;
+        }
+
+        .modal-body .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 103, 223, 0.15);
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .modal-footer .button {
+            margin-top: 0;
+        }
+        
         /* Aggiungiamo animazioni e stili visuali */
         .pulse {
             animation: pulse 1.5s infinite;
@@ -292,6 +398,22 @@
             .result-value {
                 font-size: 1.2rem;
             }
+                
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 1.5rem;
+            }
+            
+            .modal-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .close-button {
+                font-size: 1.5rem;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -318,7 +440,7 @@
             </div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" style="display: none;">
             <label class="form-label" for="exchangeRate">Tasso di cambio (1 euro in taka)</label>
             <input type="number" id="exchangeRate" class="form-control" step="0.01" placeholder="Inserisci il tasso di cambio">
             <div class="form-icon">
@@ -356,12 +478,62 @@
             &copy; 2024 HOQUE MOHAMMED TARIKUL. Tutti i diritti riservati.
         </div>
     </div>
+    
+    <div id="exchangeRateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tasso di Cambio</h2>
+                <span class="close-button" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="modalExchangeRate">Tasso di cambio (1 euro in taka)</label>
+                    <input type="number" id="modalExchangeRate" class="form-control" step="0.01" placeholder="Inserisci il tasso di cambio">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button" id="saveExchangeRate">Salva</button>
+            </div>
+        </div>
+    </div>
 
     <script>
+        const modal = document.getElementById("exchangeRateModal");
+        const closeModalBtn = document.getElementById("closeModal");
+        const saveExchangeRateBtn = document.getElementById("saveExchangeRate");
+        const exchangeRateInput = document.getElementById("modalExchangeRate");
+        const exchangeRateField = document.getElementById("exchangeRate");
+        
+        let exchangeRateValue = localStorage.getItem('exchangeRate') || 0;
+        exchangeRateField.value = exchangeRateValue;
+
+        window.onload = function() {
+            if (!localStorage.getItem('exchangeRate')) {
+                modal.style.display = "block";
+            }
+        };
+
+        closeModalBtn.onclick = function() {
+            modal.style.display = "none";
+        };
+
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        saveExchangeRateBtn.onclick = function() {
+            exchangeRateValue = parseFloat(exchangeRateInput.value) || 0;
+            localStorage.setItem('exchangeRate', exchangeRateValue);
+            exchangeRateField.value = exchangeRateValue;
+            modal.style.display = "none";
+        };
+
         function calculateTotalAmount() {
             const amount = parseFloat(document.getElementById("amount").value) || 0;
             const conversionType = document.getElementById("conversionType").value;
-            const exchangeRate = parseFloat(document.getElementById("exchangeRate").value) || 0;
+            const exchangeRate = parseFloat(exchangeRateField.value) || 0;
             let totalInTaka = 0;
             let totalInEuro = 0;
             let incentiveAmount = 0;
