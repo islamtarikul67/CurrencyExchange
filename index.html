@@ -606,6 +606,39 @@
                     this.parentNode.style.transform = 'translateY(0)';
                 });
             });
+            
+            // Corregge il problema del popup non funzionante
+            const modal = document.getElementById("exchangeRateModal");
+            const closeModalBtn = document.getElementById("closeModal");
+            const saveExchangeRateBtn = document.getElementById("saveExchangeRate");
+            const exchangeRateInput = document.getElementById("modalExchangeRate");
+            const exchangeRateField = document.getElementById("exchangeRate");
+
+            let exchangeRateValue = localStorage.getItem('exchangeRate') || 0;
+            exchangeRateField.value = exchangeRateValue;
+
+            window.onload = function() {
+                if (!localStorage.getItem('exchangeRate')) {
+                    modal.style.display = "flex"; // Usa flexbox per centrare
+                }
+            };
+
+            closeModalBtn.onclick = function() {
+                modal.style.display = "none";
+            };
+
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.style.display = "none";
+                }
+            };
+
+            saveExchangeRateBtn.onclick = function() {
+                exchangeRateValue = parseFloat(exchangeRateInput.value) || 0;
+                localStorage.setItem('exchangeRate', exchangeRateValue);
+                exchangeRateField.value = exchangeRateValue;
+                modal.style.display = "none";
+            };
         });
     </script>
 </body>
