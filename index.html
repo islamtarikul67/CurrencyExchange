@@ -1,466 +1,416 @@
-<!DOCTYPE html>
-<html lang="it">
+ <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Scatola</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Currency Converter</title>
     <style>
-        :root {
-            --bg-color: #1a202c;
-            --container-bg: #2d3748;
-            --text-color: #e2e8f0;
-            --text-muted-color: #a0aec0;
-            --border-color: #4a5568;
-            --input-bg: #4a5568;
-            --primary-accent: #00CED1;
-            --secondary-accent: #8A2BE2;
-            --toggle-active-bg: #00CED1;
-            --toggle-active-text: #1a202c;
-            --menu-bg: #374151; /* Grigio scuro per menu */
-            --menu-border: #4b5563;
-            --menu-hover-bg: rgba(255, 255, 255, 0.1);
-        }
-
-        .theme-light {
-            --bg-color: #f7fafc;
-            --container-bg: #ffffff;
-            --text-color: #2d3748;
-            --text-muted-color: #718096;
-            --border-color: #e2e8f0;
-            --input-bg: #edf2f7;
-            --menu-bg: #ffffff;
-            --menu-border: #e2e8f0;
-            --menu-hover-bg: rgba(0, 0, 0, 0.05);
-        }
-
-        .theme-blue {
-            --bg-color: #1A365D;
-            --container-bg: #2A4365;
-            --primary-accent: #63B3ED;
-            --secondary-accent: #9F7AEA;
-            --toggle-active-bg: #63B3ED;
-            --menu-bg: #1A365D;
-            --menu-border: #2A4365;
-        }
-        
-        .theme-green {
-            --bg-color: #1C4532;
-            --container-bg: #22543D;
-            --primary-accent: #68D391;
-            --secondary-accent: #4FD1C5;
-            --toggle-active-bg: #68D391;
-            --menu-bg: #1C4532;
-            --menu-border: #22543D;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
-            transition: background-color 0.3s ease;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: start;
         }
-        .main-container {
-            background-color: var(--container-bg);
-            color: var(--text-color);
-            border-color: var(--border-color);
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .gradient-button {
-            background-image: linear-gradient(to right, var(--secondary-accent), var(--primary-accent));
-            transition: all 0.2s ease;
+
+        .card-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
         }
-        .gradient-button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px var(--primary-accent);
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
         }
-        .gradient-button:active {
-            transform: scale(0.98);
+
+        .card-header::after {
+            content: '€ ↔ ৳';
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            color: white;
         }
-        .active-toggle {
-            background-color: var(--toggle-active-bg);
-            color: var(--toggle-active-text);
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .inactive-toggle {
-            background-color: transparent;
-            color: var(--text-muted-color);
+
+        .card-content {
+            padding: 2rem;
         }
-        .form-input {
-            background-color: var(--input-bg);
-            border-color: var(--border-color);
-            color: var(--text-color);
+
+        .input-group {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
         }
-        .form-input::placeholder {
-            color: var(--text-muted-color);
+
+        .input-group:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
-        .form-input:focus {
-            --tw-ring-color: var(--primary-accent);
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
         }
-        .text-primary { color: var(--primary-accent); }
-        .text-muted { color: var(--text-muted-color); }
-        .bg-subtle { background-color: rgba(255,255,255,0.07); }
-        .theme-light .bg-subtle { background-color: rgba(0,0,0,0.05); }
-        
-        #theme-menu {
-            background-color: var(--menu-bg);
-            border-color: var(--menu-border);
-            color: var(--text-color);
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #f9fafb;
         }
-        .theme-option:hover {
-            background-color: var(--menu-hover-bg);
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
-        #form-container {
-            transition: min-height 0.3s ease;
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-group:hover {
+            background-color: #f9fafb;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 0.3rem;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .results {
+            margin-top: 1.5rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            color: #4b5563;
+            transition: background-color 0.2s;
+        }
+
+        .result-row:hover {
+            background-color: #f9fafb;
+        }
+
+        .final-total {
+            border-top: 2px solid #f0f0f0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-weight: 700;
+            color: #6366f1;
+            font-size: 1.1rem;
+        }
+
+        .commission-info {
+            background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            margin-top: 1.25rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .commission-info .title {
+            color: #6366f1;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 1px solid #f87171;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error::before {
+            content: '⚠️';
+            font-size: 1.2rem;
+        }
+
+        .incentive {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .card {
+                border-radius: 1rem;
+            }
+
+            .card-header {
+                padding: 1.5rem;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .input-group {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen py-8 theme-dark">
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Currency Exchange</h1>
+        </div>
+        <div class="card-content">
+            <div id="error" class="error" style="display: none;"></div>
 
-    <div class="main-container w-full max-w-md mx-auto rounded-2xl shadow-2xl p-8 border relative">
-        
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Calcolo <span class="text-primary">Scatola</span></h1>
-            <div class="flex items-center space-x-2">
-                <!-- Theme Switcher -->
-                <div class="relative group">
-                    <button id="theme-btn" class="p-2 rounded-full hover:bg-subtle transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h8a2 2 0 002-2v-4a2 2 0 00-2-2h-8a2 2 0 00-2 2v4a2 2 0 002 2z"></path></svg>
-                    </button>
-                    <div id="theme-menu" class="absolute right-0 mt-2 w-32 border rounded-lg shadow-xl p-2 hidden group-focus-within:block focus-within:block">
-                        <button data-theme="theme-dark" class="theme-option w-full text-left px-3 py-1.5 text-sm rounded-md">Scuro</button>
-                        <button data-theme="theme-light" class="theme-option w-full text-left px-3 py-1.5 text-sm rounded-md">Chiaro</button>
-                        <button data-theme="theme-blue" class="theme-option w-full text-left px-3 py-1.5 text-sm rounded-md">Blu</button>
-                        <button data-theme="theme-green" class="theme-option w-full text-left px-3 py-1.5 text-sm rounded-md">Verde</button>
-                    </div>
-                </div>
-                <!-- Sound Toggle -->
-                <button id="sound-toggle-btn" class="p-2 rounded-full hover:bg-subtle transition-colors">
-                    <svg id="sound-on-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
-                    <svg id="sound-off-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
-                </button>
+            <div class="input-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" placeholder="Enter your amount" min="0" step="any">
             </div>
-        </div>
 
-        <!-- Toggle Buttons -->
-        <div class="flex bg-subtle rounded-lg p-1 mb-6">
-            <button id="btnNormale" class="w-1/2 p-2 rounded-md text-sm font-medium transition-all duration-300 active-toggle">Normale</button>
-            <button id="btnInverso" class="w-1/2 p-2 rounded-md text-sm font-medium transition-all duration-300 inactive-toggle">Inverso</button>
-        </div>
+            <div class="input-group">
+                <label for="conversionType">Exchange Direction</label>
+                <select id="conversionType">
+                    <option value="EURO-TAKA">Euro (€) → Taka (৳)</option>
+                    <option value="TAKA-EURO">Taka (৳) → Euro (€)</option>
+                </select>
+            </div>
 
-        <!-- Form -->
-        <div id="form-container" class="relative">
-            <div id="normale-mode-fields" class="space-y-4">
-                <div>
-                    <label class="flex items-center text-sm font-medium text-muted mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
-                        Pezzi Totali
-                    </label>
-                    <input type="number" id="input1Normale" class="form-input w-full rounded-lg p-3 outline-none transition focus:ring-2" placeholder="Es. 1000">
+            <div class="input-group">
+                <label for="exchangeRate" id="rateLabel">Exchange Rate (1 € = ? ৳)</label>
+                <input type="number" id="exchangeRate" placeholder="Current exchange rate" min="0" step="any">
+            </div>
+
+            <div class="input-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="incentive">
+                    <label for="incentive">Include 2.5% Incentive Bonus</label>
                 </div>
-                <div>
-                    <label class="flex items-center text-sm font-medium text-muted mb-2">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1.362l-2.224 1.589A1.5 1.5 0 006 7.22V10H4a1 1 0 00-1 1v2a1 1 0 001 1h12a1 1 0 001-1v-2a1 1 0 00-1-1h-2V7.22a1.5 1.5 0 00-.776-1.33L11 4.362V3a1 1 0 00-1-1zm0 4a.5.5 0 01.25.066l2.224 1.588A.5.5 0 0112.25 8H7.75a.5.5 0 01-.224-.447L9.75 6.066A.5.5 0 0110 6z" clip-rule="evenodd" /></svg>
-                        Pezzi per Scatola
-                    </label>
-                    <input type="number" id="input2Normale" class="form-input w-full rounded-lg p-3 outline-none transition focus:ring-2" placeholder="Es. 25">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="commission">
+                    <label for="commission">Calculate Commission (18.50৳/1000৳)</label>
                 </div>
             </div>
 
-            <div id="inverso-mode-fields" class="hidden space-y-4">
-                 <div>
-                    <label class="flex items-center text-sm font-medium text-muted mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-                        Scatole Complete
-                    </label>
-                    <input type="number" id="scatoleComplete" class="form-input w-full rounded-lg p-3 outline-none transition focus:ring-2" placeholder="Es. 40">
-                </div>
-                <div>
-                    <label class="flex items-center text-sm font-medium text-muted mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1.362l-2.224 1.589A1.5 1.5 0 006 7.22V10H4a1 1 0 00-1 1v2a1 1 0 001 1h12a1 1 0 001-1v-2a1 1 0 00-1-1h-2V7.22a1.5 1.5 0 00-.776-1.33L11 4.362V3a1 1 0 00-1-1zm0 4a.5.5 0 01.25.066l2.224 1.588A.5.5 0 0112.25 8H7.75a.5.5 0 01-.224-.447L9.75 6.066A.5.5 0 0110 6z" clip-rule="evenodd" /></svg>
-                        Pezzi per Scatola
-                    </label>
-                    <input type="number" id="pezziPerScatolaInverso" class="form-input w-full rounded-lg p-3 outline-none transition focus:ring-2" placeholder="Es. 25">
-                </div>
-                <div id="incomplete-boxes-container" class="space-y-3"></div>
-                <button id="addIncompleteBox" class="w-full flex items-center justify-center text-sm font-semibold text-primary bg-subtle hover:bg-black/30 rounded-lg p-2 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Aggiungi Scatola Incompleta
-                </button>
+            <button onclick="calculateTotal()">Convert Currency</button>
+
+            <div id="results" class="results" style="display: none;">
+                <!-- Results will be populated by JavaScript -->
             </div>
-        </div>
-
-        <div class="mt-8">
-            <button id="calcolaBtn" class="w-full gradient-button text-white font-bold py-3 rounded-lg text-lg">CALCOLA</button>
-        </div>
-
-        <div id="resultArea" class="mt-6 hidden transform opacity-0 transition-all duration-300">
-            <!-- I risultati verranno inseriti qui dallo script -->
-        </div>
-        
-        <div class="mt-4">
-            <button id="resetBtn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg transition-colors">Reset</button>
-        </div>
-
-        <div class="flex justify-between items-center mt-6">
-            <p class="text-xs text-muted">&copy; 2025 Hoque Mohammed Tarikul</p>
-            <p class="text-xs text-muted">v1.2.3</p>
         </div>
     </div>
 
     <script>
-        const body = document.body;
-        const formContainer = document.getElementById('form-container');
-        const btnNormale = document.getElementById('btnNormale');
-        const btnInverso = document.getElementById('btnInverso');
-        const calcolaBtn = document.getElementById('calcolaBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const resultArea = document.getElementById('resultArea');
-        const normaleModeFields = document.getElementById('normale-mode-fields');
-        const inversoModeFields = document.getElementById('inverso-mode-fields');
-        const addIncompleteBoxBtn = document.getElementById('addIncompleteBox');
-        const incompleteBoxesContainer = document.getElementById('incomplete-boxes-container');
-        const themeOptions = document.querySelectorAll('.theme-option');
-        const soundToggleBtn = document.getElementById('sound-toggle-btn');
-        const soundOnIcon = document.getElementById('sound-on-icon');
-        const soundOffIcon = document.getElementById('sound-off-icon');
+        function formatCurrency(value, currency) {
+            return `${currency} ${new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value)}`;
+        }
 
-        let currentMode = 'normale';
-        let incompleteBoxCount = 0;
-        let soundEnabled = true;
-        let audioCtx;
+        function validateInputs() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const rate = parseFloat(document.getElementById('exchangeRate').value);
+            const errorDiv = document.getElementById('error');
 
-        // --- Sound Engine ---
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!amount || amount <= 0) {
+                errorDiv.textContent = 'Please enter a valid amount greater than 0';
+                errorDiv.style.display = 'block';
+                return false;
             }
-        }
-
-        function playSound(type) {
-            if (!soundEnabled || !audioCtx) return;
-
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
-
-            if (type === 'click') {
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
-            } else if (type === 'success') {
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.05);
-                setTimeout(() => {
-                    const o2 = audioCtx.createOscillator();
-                    const g2 = audioCtx.createGain();
-                    o2.connect(g2);
-                    g2.connect(audioCtx.destination);
-                    o2.type = 'sine';
-                    o2.frequency.setValueAtTime(783.99, audioCtx.currentTime); // G5
-                    g2.gain.setValueAtTime(0, audioCtx.currentTime);
-                    g2.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.01);
-                    o2.start();
-                    g2.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-                    o2.stop(audioCtx.currentTime + 0.2);
-                }, 100);
+            if (!rate || rate <= 0) {
+                errorDiv.textContent = 'Please enter a valid exchange rate greater than 0';
+                errorDiv.style.display = 'block';
+                return false;
             }
-            
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.1);
-            oscillator.stop(audioCtx.currentTime + 0.1);
-        }
-        
-        // --- UI Logic ---
-        function setFormContainerHeight() {
-            if (currentMode === 'normale') {
-                formContainer.style.minHeight = `${normaleModeFields.offsetHeight}px`;
-            } else {
-                formContainer.style.minHeight = `${inversoModeFields.offsetHeight}px`;
-            }
+            errorDiv.style.display = 'none';
+            return true;
         }
 
-        function clearInputs() {
-            document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
-            incompleteBoxesContainer.innerHTML = '';
-            incompleteBoxCount = 0;
-            resultArea.classList.add('hidden', 'opacity-0');
-            resultArea.innerHTML = '';
-        }
+        function calculateTotal() {
+            if (!validateInputs()) return;
 
-        function updateUI() {
-            clearInputs();
-            if (currentMode === 'normale') {
-                btnNormale.classList.add('active-toggle');
-                btnNormale.classList.remove('inactive-toggle');
-                btnInverso.classList.add('inactive-toggle');
-                btnInverso.classList.remove('active-toggle');
+            const amount = parseFloat(document.getElementById('amount').value);
+            const rate = parseFloat(document.getElementById('exchangeRate').value);
+            const conversionType = document.getElementById('conversionType').value;
+            const includeIncentive = document.getElementById('incentive').checked;
+            const showCommission = document.getElementById('commission').checked;
 
-                normaleModeFields.classList.remove('hidden');
-                inversoModeFields.classList.add('hidden');
-            } else {
-                btnInverso.classList.add('active-toggle');
-                btnInverso.classList.remove('inactive-toggle');
-                btnNormale.classList.add('inactive-toggle');
-                btnNormale.classList.remove('active-toggle');
+            const fromCurrency = conversionType === 'EURO-TAKA' ? '€' : '৳';
+            const toCurrency = conversionType === 'EURO-TAKA' ? '৳' : '€';
 
-                normaleModeFields.classList.add('hidden');
-                inversoModeFields.classList.remove('hidden');
-            }
-            requestAnimationFrame(setFormContainerHeight);
-        }
+            const convertedAmount = conversionType === 'EURO-TAKA' 
+                ? amount * rate 
+                : amount / rate;
+            const incentiveAmount = includeIncentive ? convertedAmount * 0.025 : 0;
+            const subtotal = convertedAmount + incentiveAmount;
+            const commissionAmount = Math.ceil(subtotal / 1000) * 18.50;
 
-        function addIncompleteBoxField() {
-            playSound('click');
-            incompleteBoxCount++;
-            const newField = document.createElement('div');
-            newField.classList.add('flex', 'items-center', 'space-x-2');
-            newField.innerHTML = `
-                <div class="flex-grow">
-                    <label class="text-sm font-medium text-muted">Scatola Incompleta #${incompleteBoxCount}</label>
-                    <input type="number" class="incomplete-box-input form-input w-full rounded-lg p-2 mt-1 outline-none transition focus:ring-2" placeholder="Pezzi">
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-row">
+                    <span>Initial Amount:</span>
+                    <span>${formatCurrency(amount, fromCurrency)}</span>
                 </div>
-                <button type="button" class="remove-box-btn mt-6 p-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-md">
-                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                </button>
+                <div class="result-row">
+                    <span>Converted Amount:</span>
+                    <span>${formatCurrency(convertedAmount, toCurrency)}</span>
+                </div>
+                ${includeIncentive ? `
+                    <div class="result-row incentive">
+                        <span>Incentive Bonus (2.5%):</span>
+                        <span>${formatCurrency(incentiveAmount, toCurrency)}</span>
+                    </div>
+                ` : ''}
+                <div class="result-row final-total">
+                    <span>Final Amount:</span>
+                    <span>${formatCurrency(subtotal, toCurrency)}</span>
+                </div>
+                ${showCommission ? `
+                    <div class="commission-info">
+                        <div class="title">Commission Details</div>
+                        <div class="result-row">
+                            <span>Commission Fee:</span>
+                            <span>${formatCurrency(commissionAmount, '৳')}</span>
+                        </div>
+                    </div>
+                ` : ''}
             `;
-            incompleteBoxesContainer.appendChild(newField);
-            newField.querySelector('.remove-box-btn').addEventListener('click', (e) => {
-                playSound('click');
-                e.currentTarget.parentElement.remove();
-                requestAnimationFrame(setFormContainerHeight);
-            });
-            requestAnimationFrame(setFormContainerHeight);
+            resultsDiv.style.display = 'block';
         }
 
-        function showResult(htmlContent) {
-            resultArea.innerHTML = htmlContent;
-            resultArea.classList.remove('hidden');
-            setTimeout(() => {
-                resultArea.classList.remove('opacity-0');
-            }, 10);
-        }
+        // Update exchange rate label based on conversion type
+        document.getElementById('conversionType').addEventListener('change', function(e) {
+            const label = document.getElementById('rateLabel');
+            label.textContent = `Exchange Rate (1 € = ? ৳)`;
+        });
 
-        function calculate() {
-            let success = false;
-            let resultHTML = '';
-
-            if (currentMode === 'normale') {
-                const pezziTotali = parseFloat(document.getElementById('input1Normale').value);
-                const pezziPerScatola = parseFloat(document.getElementById('input2Normale').value);
-
-                if (isNaN(pezziTotali) || isNaN(pezziPerScatola) || pezziTotali <= 0 || pezziPerScatola <= 0) {
-                    resultHTML = `<div class="bg-subtle p-4 rounded-lg text-center text-red-400">Per favore, inserisci valori validi.</div>`;
-                } else {
-                    const scatoleNecessarie = Math.ceil(pezziTotali / pezziPerScatola);
-                    const scatoleComplete = Math.floor(pezziTotali / pezziPerScatola);
-                    const pezziRimanenti = pezziTotali % pezziPerScatola;
-                    
-                    let breakdownHTML = '';
-                    if (pezziRimanenti > 0) {
-                        breakdownHTML = `
-                            <div class="border-t border-white/10 my-4"></div>
-                            <div class="flex justify-around items-center text-muted">
-                                <div class="text-center">
-                                    <svg class="w-8 h-8 mx-auto mb-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m0 0v10l8 4m0-14L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                                    <p class="text-xl font-semibold text-color">${scatoleComplete}</p>
-                                    <p class="text-xs uppercase">Complete</p>
-                                </div>
-                                <div class="text-center">
-                                    <svg class="w-8 h-8 mx-auto mb-1 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4M4 7l8 4 8-4"></path><path stroke-linecap="round" stroke-linejoin="round" d="M4 12l8 4 8-4"></path></svg>
-                                    <p class="text-xl font-semibold text-color">${pezziRimanenti}</p>
-                                    <p class="text-xs uppercase">Rimanenti</p>
-                                </div>
-                            </div>`;
-                    }
-
-                    resultHTML = `
-                        <div class="bg-subtle p-5 rounded-lg text-center">
-                            <p class="text-sm font-medium text-muted uppercase tracking-wider">Scatole Totali</p>
-                            <p class="text-5xl font-bold text-primary my-2">${scatoleNecessarie}</p>
-                            ${breakdownHTML}
-                        </div>`;
-                    success = true;
-                }
-            } else {
-                const scatoleComplete = parseFloat(document.getElementById('scatoleComplete').value);
-                const pezziPerScatola = parseFloat(document.getElementById('pezziPerScatolaInverso').value);
-
-                if (isNaN(scatoleComplete) || isNaN(pezziPerScatola) || scatoleComplete < 0 || pezziPerScatola <= 0) {
-                    resultHTML = `<div class="bg-subtle p-4 rounded-lg text-center text-red-400">Inserisci valori validi per scatole e pezzi.</div>`;
-                } else {
-                    let totalIncompletePieces = 0;
-                    let validationError = false;
-                    const incompleteInputs = document.querySelectorAll('.incomplete-box-input');
-                    
-                    incompleteInputs.forEach(input => {
-                        const value = parseFloat(input.value);
-                        if (isNaN(value) || value < 0) validationError = true;
-                        if (value >= pezziPerScatola) {
-                            validationError = true;
-                            resultHTML = `<div class="bg-subtle p-4 rounded-lg text-center text-red-400">Una scatola incompleta non può avere ${pezziPerScatola} o più pezzi.</div>`;
-                        }
-                        if (!validationError) totalIncompletePieces += value;
-                    });
-
-                    if (validationError) {
-                        if (resultHTML === '') resultHTML = `<div class="bg-subtle p-4 rounded-lg text-center text-red-400">Controlla i valori delle scatole incomplete.</div>`;
-                    } else {
-                        const result = (scatoleComplete * pezziPerScatola) + totalIncompletePieces;
-                        resultHTML = `
-                        <div class="bg-subtle p-5 rounded-lg text-center">
-                            <p class="text-sm font-medium text-muted uppercase tracking-wider">Pezzi Totali</p>
-                            <p class="text-5xl font-bold text-primary my-2">${result}</p>
-                        </div>`;
-                        success = true;
-                    }
-                }
+        // Handle Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateTotal();
             }
-            
-            showResult(resultHTML);
-            if (success) playSound('success');
-        }
-
-        // --- Event Listeners ---
-        document.addEventListener('click', initAudio, { once: true });
-        
-        btnNormale.addEventListener('click', () => { playSound('click'); currentMode = 'normale'; updateUI(); });
-        btnInverso.addEventListener('click', () => { playSound('click'); currentMode = 'inverso'; updateUI(); });
-        
-        addIncompleteBoxBtn.addEventListener('click', addIncompleteBoxField);
-        calcolaBtn.addEventListener('click', () => { playSound('click'); calculate(); });
-        resetBtn.addEventListener('click', () => { playSound('click'); clearInputs(); });
-
-        themeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                playSound('click');
-                body.className = body.className.replace(/theme-\w+/g, '');
-                body.classList.add(option.dataset.theme);
-            });
         });
-
-        soundToggleBtn.addEventListener('click', () => {
-            soundEnabled = !soundEnabled;
-            soundOnIcon.classList.toggle('hidden', !soundEnabled);
-            soundOffIcon.classList.toggle('hidden', soundEnabled);
-            playSound('click');
-        });
-
-        // Initialize and set height on load and resize
-        window.addEventListener('load', updateUI);
-        window.addEventListener('resize', setFormContainerHeight);
-
     </script>
-
 </body>
 </html>
