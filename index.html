@@ -150,7 +150,7 @@
         <footer class="text-center mt-8 text-sm text-gray-500 dark:text-gray-400 space-y-2">
              <button id="reset-button" class="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 dark:text-indigo-200 dark:bg-indigo-900/50 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/80 transition-colors">Reset</button>
             <p>Progettato con ♥ per un calcolo efficiente.</p>
-            <p class="mt-1">Versione 4.6</p>
+            <p class="mt-1">Versione 4.7</p>
         </footer>
     </div>
 
@@ -198,7 +198,8 @@
             const saveRateButton = document.getElementById('saveRateButton');
             const modalError = document.getElementById('modal-error');
 
-            let activeMode = 'normale'; // Imposta Normale come modalità predefinita
+            let activeMode = 'normale'; 
+            let currentRate = 0;
 
             // --- Gestione Schede ---
             function switchMode(mode) {
@@ -257,8 +258,8 @@
                 const newRate = parseFloat(newRateString);
                 if (newRate && newRate > 0) {
                     modalError.classList.add('hidden');
+                    currentRate = newRate;
                     exchangeRateInput.value = newRate.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-                    localStorage.setItem('exchangeRate', newRate);
                     closeModal();
                     if (activeMode === 'normale') calculateNormale(); else calculateInverso();
                 } else {
@@ -287,8 +288,6 @@
             }
 
             function calculateNormale() {
-                const rate = parseFloat(localStorage.getItem('exchangeRate'));
-                if (!rate) return;
                 const eurAmount = parseValue(normaleEurInput.value);
                 if (eurAmount <= 0) {
                     normaleBdtResult.value = '';
@@ -297,15 +296,13 @@
                 }
                 const includeIncentive = incentiveCheckbox.checked;
                 const incentiveMultiplier = 1.025;
-                const convertedBdt = eurAmount * rate;
+                const convertedBdt = eurAmount * currentRate;
                 const finalBdt = includeIncentive ? convertedBdt * incentiveMultiplier : convertedBdt;
                 normaleBdtResult.value = formatValue(convertedBdt);
                 displayResultsDetails(eurAmount, convertedBdt, finalBdt, includeIncentive);
             }
 
             function calculateInverso() {
-                const rate = parseFloat(localStorage.getItem('exchangeRate'));
-                if (!rate) return;
                 const bdtAmount = parseValue(inversoBdtInput.value);
                 if (bdtAmount <= 0) {
                     inversoEurResult.value = '';
@@ -315,12 +312,12 @@
                 const includeIncentive = true; // Sempre attivo in modalità inversa
                 const incentiveMultiplier = 1.025;
                 const convertedBdt = bdtAmount / incentiveMultiplier;
-                const exactEur = convertedBdt / rate;
+                const exactEur = convertedBdt / currentRate;
                 const roundedUpEur = Math.ceil(exactEur * 100) / 100;
                 
                 inversoEurResult.value = formatValue(roundedUpEur, 2);
 
-                const newConvertedBdt = roundedUpEur * rate;
+                const newConvertedBdt = roundedUpEur * currentRate;
                 const newFinalBdt = newConvertedBdt * incentiveMultiplier;
 
                 displayResultsDetails(roundedUpEur, newConvertedBdt, newFinalBdt, includeIncentive);
@@ -388,13 +385,8 @@
             modalExchangeRateInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') saveRate(); });
             
             // --- Inizializzazione ---
-            const savedRate = localStorage.getItem('exchangeRate');
-            if (savedRate) {
-                exchangeRateInput.value = parseFloat(savedRate).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-            } else {
-                openModal();
-            }
             switchMode(activeMode); // Applica la modalità predefinita all'avvio
+            openModal(); // Mostra sempre il modale all'avvio
         });
     </script>
 
